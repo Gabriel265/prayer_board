@@ -1,0 +1,97 @@
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #666;
+}
+
+/* Animations */
+.fade-in {
+    animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Custom Modal Animation */
+.modal {
+    animation: modalFade 0.3s ease-out;
+}
+
+@keyframes modalFade {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Prayer Card Hover Effects */
+.prayer-card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.prayer-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Custom Button Styles */
+.btn-primary {
+    @apply bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200;
+}
+
+.btn-secondary {
+    @apply bg-gray-500 text-white px-4 py-2 rounded hover:bg-gray-600 transition-colors duration-200;
+}
+
+/* Custom Form Styles */
+.form-input {
+    @apply w-full p-2 border rounded focus:ring-2 focus:ring-blue-300 focus:border-blue-500 outline-none transition-all duration-200;
+}
+
+/* Toast Notification Styles */
+.toast {
+    @apply fixed bottom-4 right-4 bg-white shadow-lg rounded-lg p-4 max-w-md z-50;
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Responsive Grid Adjustments */
+@media (max-width: 640px) {
+    .grid-cols-auto {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+}

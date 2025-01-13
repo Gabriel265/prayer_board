@@ -482,32 +482,28 @@ $envelopes = getBoardEnvelopes($board_id);
                     <div class="flex justify-between items-center mb-4">
                         <h3 class="text-xl font-semibold"><?php echo htmlspecialchars($envelope['name']); ?></h3>
                         <div class="flex items-center space-x-2">
-                        <button onclick="showEditEnvelopeModal(
-                            <?php echo $envelope['id']; ?>, 
-                            '<?php echo htmlspecialchars(addslashes($envelope['name'])); ?>', 
-                            '<?php echo htmlspecialchars($envelope['color']); ?>')"
-                            class="text-gray-500 hover:text-gray-700">
-                            Edit
-                        </button>
-                        <form action="board.php" method="POST" class="inline" 
-                  onsubmit="return confirm('Are you sure you want to delete this Category?');">
-                <input type="hidden" name="action" value="delete_envelope">
-                <input type="hidden" name="envelope_id" value="<?php echo $envelope['id']; ?>">
-                <input type="hidden" name="board_id" value="<?php echo $envelope['board_id']; ?>">
-                <button type="submit" class="text-red-500 hover:text-red-700">
-                    Delete
-                </button>
-            </form>
-                            <!-- <button onclick="deleteEnvelope(<?php echo $envelope['id']; ?>)"
-                                    class="text-red-500 hover:text-red-700">
-                                Delete
-                            </button> -->
+                            <button onclick="showEditEnvelopeModal(
+                                <?php echo $envelope['id']; ?>, 
+                                '<?php echo htmlspecialchars(addslashes($envelope['name'])); ?>', 
+                                '<?php echo htmlspecialchars($envelope['color']); ?>')"
+                                class="text-gray-500 hover:text-gray-700">
+                                Edit
+                            </button>
+                            <form action="board.php" method="POST" class="inline" 
+                                onsubmit="return confirm('Are you sure you want to delete this Category?');">
+                                <input type="hidden" name="action" value="delete_envelope">
+                                <input type="hidden" name="envelope_id" value="<?php echo $envelope['id']; ?>">
+                                <input type="hidden" name="board_id" value="<?php echo $envelope['board_id']; ?>">
+                                <button type="submit" class="text-red-500 hover:text-red-700">
+                                    Delete
+                                </button>
+                            </form>
                         </div>
                     </div>
                     
                     <div class="space-y-2 mb-4">
                         <p class="text-gray-600">
-                            Total Prayers: <?php echo $envelope['prayer_count']; ?>
+                            Total Prayer(s): <?php echo $envelope['prayer_count']; ?>
                         </p>
                         <p class="text-green-600">
                             Answered: <?php echo $envelope['answered_count']; ?>

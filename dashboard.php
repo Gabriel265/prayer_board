@@ -72,23 +72,44 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['create_board'])) {
 
         <!-- Prayer Boards Grid -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <?php foreach ($boards as $board): ?>
-                <div class="bg-white rounded-lg shadow-md p-6" style="background-color: <?php echo htmlspecialchars($board['background_color']); ?>">
-                    <h3 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($board['name']); ?></h3>
-                    <p class="text-gray-600 mb-4"><?php echo htmlspecialchars($board['description']); ?></p>
-                    <div class="flex justify-between items-center">
-                        <div class="text-sm text-gray-500">
-                            <p><?php echo $board['envelope_count']; ?> envelopes</p>
-                            <p><?php echo $board['prayer_count']; ?> prayers</p>
-                        </div>
-                        <a href="board.php?id=<?php echo $board['id']; ?>" 
-                           class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
-                            Open Board
-                        </a>
-                    </div>
+    <?php foreach ($boards as $board): ?>
+        <div class="bg-white rounded-lg shadow-md p-6 relative" style="background-color: <?php echo htmlspecialchars($board['background_color']); ?>">
+            <!-- Edit/Delete buttons moved to top-right -->
+            <div class="absolute top-4 right-4 flex items-center space-x-2">
+                <button onclick="showEditEnvelopeModal(
+                    <?php echo $envelope['id']; ?>, 
+                    '<?php echo htmlspecialchars(addslashes($board['name'])); ?>', 
+                    '<?php echo htmlspecialchars($board['background_color']); ?>')"
+                    class="text-gray-500 hover:text-gray-700">
+                    Edit
+                </button>
+                <form action="board.php" method="POST" class="inline" 
+                    onsubmit="return confirm('Are you sure you want to delete this Category?');">
+                    <input type="hidden" name="action" value="delete_envelope">
+                    <input type="hidden" name="envelope_id" value="<?php echo $board['id']; ?>">
+                    <button type="submit" class="text-red-500 hover:text-red-700">
+                        Delete
+                    </button>
+                </form>
+            </div>
+
+            <!-- Board content -->
+            <h3 class="text-xl font-semibold mb-2"><?php echo htmlspecialchars($board['name']); ?></h3>
+            <p class="text-gray-600 mb-4"><?php echo htmlspecialchars($board['description']); ?></p>
+            
+            <div class="flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    <p><?php echo $board['envelope_count']; ?> envelope(s)</p>
+                    <p><?php echo $board['prayer_count']; ?> prayer(s)</p>
                 </div>
-            <?php endforeach; ?>
+                <a href="board.php?id=<?php echo $board['id']; ?>" 
+                   class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Open Board
+                </a>
+            </div>
         </div>
+    <?php endforeach; ?>
+</div>
     </main>
 
     <!-- Create Board Modal -->

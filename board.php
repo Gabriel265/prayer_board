@@ -1,7 +1,63 @@
 <?php
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
+
+
 require_once 'config/database.php';
 require_once 'includes/auth.php';
 requireLogin();
+
+// Handle form submissions
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    switch ($_POST['action']) {
+        case 'create_envelope':
+            $board_id = $_POST['board_id'] ?? null;
+            $name = trim($_POST['name'] ?? '');
+            $color = $_POST['color'] ?? '#ffffff';
+            
+            if (empty($name)) {
+                $_SESSION['error'] = 'Envelope name is required';
+                header("Location: board.php?id=" . urlencode($board_id));
+                exit;
+            }
+            
+            // Verify board ownership
+            $check_stmt = $pdo->prepare("SELECT id FROM prayer_boards WHERE id = ? AND user_id = ?");
+            $check_stmt->execute([$board_id, $_SESSION['user_id']]);
+            if (!$check_stmt->fetch()) {
+                $_SESSION['error'] = 'Unauthorized access';
+                header("Location: dashboard.php");
+                exit;
+            }
+            
+            try {
+                // Get the next order index
+                $order_stmt = $pdo->prepare("SELECT COALESCE(MAX(order_index), -1) + 1 FROM envelopes WHERE board_id = ?");
+                $order_stmt->execute([$board_id]);
+                $order_index = $order_stmt->fetchColumn();
+                
+                // Insert the new envelope
+                $stmt = $pdo->prepare("
+                    INSERT INTO envelopes (board_id, name, color, order_index) 
+                    VALUES (?, ?, ?, ?)
+                ");
+                
+                if ($stmt->execute([$board_id, $name, $color, $order_index])) {
+                    $_SESSION['success'] = 'Envelope created successfully';
+                } else {
+                    $_SESSION['error'] = 'Failed to create envelope';
+                }
+            } catch (PDOException $e) {
+                $_SESSION['error'] = 'Database error occurred';
+                error_log('Database error: ' . $e->getMessage());
+            }
+            
+            header("Location: board.php?id=" . urlencode($board_id));
+            exit;
+    }
+}
+
+
 
 $board_id = $_GET['id'] ?? null;
 if (!$board_id) {
@@ -52,40 +108,59 @@ function getEnvelopePrayers($envelopeId) {
 // Handle AJAX requests
 if (isset($_POST['action'])) {
     header('Content-Type: application/json');
+
+    // Check session for AJAX requests
+    if (!isset($_SESSION['user_id'])) {
+        echo json_encode([
+            'success' => false,
+            'message' => 'Session expired. Please refresh the page.'
+        ]);
+        exit;
+    }
     
     switch ($_POST['action']) {
 
-        case 'create_envelope':
-            $board_id = $_POST['board_id'];
-            $name = trim($_POST['name']);
-            $color = $_POST['color'];
+        //  case 'create_envelope':
+        //     $board_id = $_POST['board_id'] ?? null;
+        //     $name = trim($_POST['name'] ?? '');
+        //     $color = $_POST['color'] ?? '';
             
-            // Verify board ownership
-            $check_stmt = $pdo->prepare("SELECT id FROM prayer_boards WHERE id = ? AND user_id = ?");
-            $check_stmt->execute([$board_id, $_SESSION['user_id']]);
-            if (!$check_stmt->fetch()) {
-                echo json_encode(['success' => false, 'message' => 'Unauthorized']);
-                exit;
-            }
-            
-            // Get the next order index
-            $order_stmt = $pdo->prepare("SELECT COALESCE(MAX(order_index), -1) + 1 FROM envelopes WHERE board_id = ?");
-            $order_stmt->execute([$board_id]);
-            $order_index = $order_stmt->fetchColumn();
-            
-            // Insert the new envelope
-            $stmt = $pdo->prepare("
-                INSERT INTO envelopes (board_id, name, color, order_index) 
-                VALUES (?, ?, ?, ?)
-            ");
-            $success = $stmt->execute([$board_id, $name, $color, $order_index]);
-            
-            if ($success) {
-                echo json_encode(['success' => true, 'id' => $pdo->lastInsertId()]);
-            } else {
-                echo json_encode(['success' => false, 'message' => 'Database error']);
-            }
-            exit;
+        //     try {
+        //         // Verify board ownership
+        //         $check_stmt = $pdo->prepare("SELECT id FROM prayer_boards WHERE id = ? AND user_id = ?");
+        //         $check_stmt->execute([$board_id, $_SESSION['user_id']]);
+        //         if (!$check_stmt->fetch()) {
+        //             echo json_encode([
+        //                 'success' => false,
+        //                 'message' => 'Unauthorized'
+        //             ]);
+        //             exit;
+        //         }
+                
+        //         // Get the next order index
+        //         $order_stmt = $pdo->prepare("SELECT COALESCE(MAX(order_index), -1) + 1 FROM envelopes WHERE board_id = ?");
+        //         $order_stmt->execute([$board_id]);
+        //         $order_index = $order_stmt->fetchColumn();
+                
+        //         // Insert the new envelope
+        //         $stmt = $pdo->prepare("
+        //             INSERT INTO envelopes (board_id, name, color, order_index) 
+        //             VALUES (?, ?, ?, ?)
+        //         ");
+        //         $success = $stmt->execute([$board_id, $name, $color, $order_index]);
+                
+        //         echo json_encode([
+        //             'success' => $success,
+        //             'id' => $success ? $pdo->lastInsertId() : null
+        //         ]);
+        //     } catch (PDOException $e) {
+        //         error_log('Database error: ' . $e->getMessage());
+        //         echo json_encode([
+        //             'success' => false,
+        //             'message' => 'Database error occurred'
+        //         ]);
+        //     }
+        //     exit;
 
         case 'add_prayer':
             $envelope_id = $_POST['envelope_id'];
@@ -151,6 +226,26 @@ $envelopes = getBoardEnvelopes($board_id);
         </div>
     </nav>
 
+    <div class="max-w-6xl mx-auto px-4">
+    <?php if (isset($_SESSION['success'])): ?>
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mt-4">
+            <?php 
+            echo htmlspecialchars($_SESSION['success']);
+            unset($_SESSION['success']);
+            ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mt-4">
+            <?php 
+            echo htmlspecialchars($_SESSION['error']);
+            unset($_SESSION['error']);
+            ?>
+        </div>
+    <?php endif; ?>
+</div>
+
     <main class="max-w-6xl mx-auto px-4 py-8">
         <div id="envelopes" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             <?php foreach ($envelopes as $envelope): ?>
@@ -215,30 +310,41 @@ $envelopes = getBoardEnvelopes($board_id);
     </div>
 
     <!-- Create/Edit Envelope Modal -->
-    <div id="envelopeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-        <div class="bg-white rounded-lg p-8 w-96">
-            <h2 class="text-xl font-bold mb-4" id="envelopeModalTitle">Create New Envelope</h2>
-            <form onsubmit="saveEnvelope(event)" class="space-y-4">
-                <input type="hidden" id="editEnvelopeId">
-                <div>
-                    <label class="block text-gray-700 mb-2">Envelope Name</label>
-                    <input type="text" id="envelopeName" class="w-full p-2 border rounded" required>
-                </div>
-                
-                <div>
-                    <label class="block text-gray-700 mb-2">Color</label>
-                    <input type="color" id="envelopeColor" class="w-full p-2 border rounded">
-                </div>
-                
-                <div class="flex justify-end space-x-4">
-                    <button type="button" onclick="hideEnvelopeModal()" 
-                            class="px-4 py-2 border rounded">Cancel</button>
-                    <button type="submit" 
-                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Save</button>
-                </div>
-            </form>
+<div id="envelopeModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+    <div class="bg-white rounded-lg p-8 w-96">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-xl font-bold" id="envelopeModalTitle">Create New Envelope</h2>
+            <button onclick="hideEnvelopeModal()" class="text-gray-500 hover:text-gray-700">&times;</button>
         </div>
+        <form action="board.php" method="POST" class="space-y-4">
+            <input type="hidden" name="action" value="create_envelope">
+            <input type="hidden" name="board_id" value="<?php echo htmlspecialchars($board_id); ?>">
+            
+            <div>
+                <label class="block text-gray-700 mb-2">Envelope Name</label>
+                <input type="text" name="name" class="w-full p-2 border rounded" required 
+                       placeholder="Enter envelope name">
+            </div>
+            
+            <div>
+                <label class="block text-gray-700 mb-2">Color</label>
+                <input type="color" name="color" class="w-full h-10 p-1 border rounded" 
+                       value="#ffffff">
+            </div>
+            
+            <div class="flex justify-end space-x-4 mt-6">
+                <button type="button" onclick="hideEnvelopeModal()" 
+                        class="px-4 py-2 border rounded hover:bg-gray-100">
+                    Cancel
+                </button>
+                <button type="submit" 
+                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Create Envelope
+                </button>
+            </div>
+        </form>
     </div>
+</div>
 
     <script>
     // Initialize Sortable for envelope drag-and-drop
@@ -259,18 +365,32 @@ $envelopes = getBoardEnvelopes($board_id);
     });
 
     // Envelope management functions
+
     function showEnvelopeModal() {
-        // Reset form
-        document.getElementById('editEnvelopeId').value = '';
-        document.getElementById('envelopeName').value = '';
-        document.getElementById('envelopeColor').value = '#ffffff';
-        document.getElementById('envelopeModalTitle').textContent = 'Create New Envelope';
-        modal.show('envelopeModal');
-    }
+    document.getElementById('envelopeModal').classList.remove('hidden');
+    // Focus on the name input when modal opens
+    setTimeout(() => {
+        document.querySelector('#envelopeModal input[name="name"]').focus();
+    }, 100);
+}
+
+function hideEnvelopeModal() {
+    document.getElementById('envelopeModal').classList.add('hidden');
+    // Reset form when modal closes
+    document.querySelector('#envelopeModal form').reset();
+}
+    // function showEnvelopeModal() {
+    //     // Reset form
+    //     document.getElementById('editEnvelopeId').value = '';
+    //     document.getElementById('envelopeName').value = '';
+    //     document.getElementById('envelopeColor').value = '#ffffff';
+    //     document.getElementById('envelopeModalTitle').textContent = 'Create New Envelope';
+    //     modal.show('envelopeModal');
+    // }
     
-    function hideEnvelopeModal() {
-        modal.hide('envelopeModal');
-    }
+    // function hideEnvelopeModal() {
+    //     modal.hide('envelopeModal');
+    // }
 
     async function saveEnvelope(event) {
         event.preventDefault();
@@ -362,95 +482,6 @@ $envelopes = getBoardEnvelopes($board_id);
     }
 </script>
 
-    <!-- <script>
-        // Initialize Sortable for envelope drag-and-drop
-        new Sortable(document.getElementById('envelopes'), {
-            animation: 150,
-            onEnd: function(evt) {
-                const envelopeId = evt.item.getAttribute('data-id');
-                const newIndex = evt.newIndex;
-                
-                fetch('board.php', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: `action=update_order&envelope_id=${envelopeId}&new_index=${newIndex}`
-                });
-            }
-        });
-
-        // Prayer management functions
-        async function viewPrayers(envelopeId) {
-            const response = await fetch(`get_prayers.php?envelope_id=${envelopeId}`);
-            const prayers = await response.json();
-            
-            document.getElementById('currentEnvelopeId').value = envelopeId;
-            const prayerList = document.getElementById('prayerList');
-            prayerList.innerHTML = '';
-            
-            prayers.forEach(prayer => {
-                const div = document.createElement('div');
-                div.className = 'flex justify-between items-center p-4 bg-gray-50 rounded';
-                div.innerHTML = `
-                    <span class="${prayer.answered_at ? 'line-through text-gray-500' : ''}">${prayer.content}</span>
-                    <button onclick="markAnswered(${prayer.id})" 
-                            class="${prayer.answered_at ? 'text-green-500' : 'text-gray-500'} hover:text-green-700">
-                        ${prayer.answered_at ? 'Answered' : 'Mark as Answered'}
-                    </button>
-                `;
-                prayerList.appendChild(div);
-            });
-            
-            document.getElementById('prayerModal').classList.remove('hidden');
-        }
-
-        async function addPrayer(event) {
-            event.preventDefault();
-            const envelopeId = document.getElementById('currentEnvelopeId').value;
-            const content = document.getElementById('newPrayer').value;
-            
-            const response = await fetch('board.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=add_prayer&envelope_id=${envelopeId}&content=${encodeURIComponent(content)}`
-            });
-            
-            if ((await response.json()).success) {
-                document.getElementById('newPrayer').value = '';
-                viewPrayers(envelopeId);
-            }
-        }
-
-        async function markAnswered(prayerId) {
-            const response = await fetch('board.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `action=mark_answered&prayer_id=${prayerId}`
-            });
-            
-            if ((await response.json()).success) {
-                const envelopeId = document.getElementById('currentEnvelopeId').value;
-                viewPrayers(envelopeId);
-            }
-        }
-
-        // Modal management functions
-        function showEnvelopeModal() {
-            document.getElementById('envelopeModal').classList.remove('hidden');
-        }
-        
-        function hideEnvelopeModal() {
-            document.getElementById('envelopeModal').classList.add('hidden');
-        }
-        
-        function hidePrayerModal() {
-            document.getElementById('prayerModal').classList.add('hidden');
-        }
-    </script> -->
+    
 </body>
 </html>

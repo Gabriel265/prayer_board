@@ -14,7 +14,7 @@ require_once 'includes/header.php';
                 <a href="login.php" class="text-blue-500 hover:text-blue-600">Already have an account?</a>
             </div>
         <?php else: ?>
-            <a href="/dashboard.php" class="bg-blue-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-600">Go to Dashboard</a>
+            <a href="./dashboard.php" class="bg-blue-500 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-600">Go to Dashboard</a>
         <?php endif; ?>
     </div>
 

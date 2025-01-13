@@ -70,17 +70,55 @@ const modal = {
     }
 };
 
-// Prayer Board Management
-const prayerBoard = {
 
-    
+
+// Prayer Board Management System
+const prayerBoard = {
+    // Create a new envelope
     createEnvelope: async (boardId, data) => {
         try {
+            // Form data preparation
             const formData = new URLSearchParams();
             formData.append('action', 'create_envelope');
             formData.append('board_id', boardId);
             formData.append('name', data.name);
             formData.append('color', data.color);
+            
+            // Make the request
+            const response = await fetch('board.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
+            });
+            
+            // Check if response is JSON
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned invalid response format');
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.message || 'Failed to create envelope');
+            }
+            
+            return result;
+        } catch (error) {
+            console.error('Create envelope error:', error);
+            throw new Error('Failed to create envelope. Please try again.');
+        }
+    },
+    
+    // Add a new prayer
+    addPrayer: async (envelopeId, content) => {
+        try {
+            const formData = new URLSearchParams();
+            formData.append('action', 'add_prayer');
+            formData.append('envelope_id', envelopeId);
+            formData.append('content', content);
             
             const response = await fetch('board.php', {
                 method: 'POST',
@@ -90,58 +128,121 @@ const prayerBoard = {
                 body: formData.toString()
             });
             
-            const result = await response.json();
-            
-            if (!result.success) {
-                throw new Error(result.message || 'Failed to create envelope');
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned invalid response format');
             }
             
-            toast.show('Envelope created successfully');
-            return result;
-        } catch (error) {
-            toast.show(error.message, 'error');
-            throw error;
-        }
-    },
-    
-    addPrayer: async (envelopeId, content) => {
-        try {
-            const response = await fetch('/api/prayers', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ envelopeId, content })
-            });
-            
-            if (!response.ok) throw new Error('Failed to add prayer');
-            
             const result = await response.json();
-            toast.show('Prayer added successfully');
+            if (!result.success) {
+                throw new Error('Failed to add prayer');
+            }
+            
             return result;
         } catch (error) {
-            toast.show(error.message, 'error');
-            throw error;
+            console.error('Add prayer error:', error);
+            throw new Error('Failed to add prayer. Please try again.');
         }
     },
     
+    // Mark a prayer as answered
     markAnswered: async (prayerId) => {
         try {
-            const response = await fetch(`/api/prayers/${prayerId}/answer`, {
-                method: 'PUT'
+            const formData = new URLSearchParams();
+            formData.append('action', 'mark_answered');
+            formData.append('prayer_id', prayerId);
+            
+            const response = await fetch('board.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: formData.toString()
             });
             
-            if (!response.ok) throw new Error('Failed to mark prayer as answered');
+            const contentType = response.headers.get('content-type');
+            if (!contentType || !contentType.includes('application/json')) {
+                throw new Error('Server returned invalid response format');
+            }
             
             const result = await response.json();
-            toast.show('Prayer marked as answered');
+            if (!result.success) {
+                throw new Error('Failed to mark prayer as answered');
+            }
+            
             return result;
         } catch (error) {
-            toast.show(error.message, 'error');
-            throw error;
+            console.error('Mark answered error:', error);
+            throw new Error('Failed to mark prayer as answered. Please try again.');
         }
     }
 };
+
+// Form handling functions
+async function saveEnvelope(event) {
+    event.preventDefault();
+    
+    try {
+        // Validate form
+        if (!validateForm(event.target)) {
+            return;
+        }
+        
+        const name = document.getElementById('envelopeName').value;
+        const color = document.getElementById('envelopeColor').value;
+        
+        // Get board ID from URL parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const boardId = urlParams.get('id');
+        
+        // Log what we're sending
+        console.log('Sending data:', {
+            boardId,
+            name,
+            color
+        });
+
+        const formData = new URLSearchParams();
+        formData.append('action', 'create_envelope');
+        formData.append('board_id', boardId);
+        formData.append('name', name);
+        formData.append('color', color);
+
+        const response = await fetch('board.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: formData.toString()
+        });
+
+        // Log the full response before trying to parse it
+        const rawText = await response.text();
+        console.log('Raw server response:', rawText);
+        
+        // Now we can see what the server is actually returning
+        if (rawText.trim().startsWith('<!DOCTYPE')) {
+            throw new Error('Server returned HTML instead of JSON. Session may have expired.');
+        }
+
+        const result = JSON.parse(rawText);
+        
+        if (!result.success) {
+            throw new Error(result.message || 'Failed to create envelope');
+        }
+        
+        toast.show('Envelope created successfully');
+        hideEnvelopeModal();
+        window.location.reload();
+    } catch (error) {
+        toast.show(error.message, 'error');
+        console.error('Full response error:', error);
+    }
+}
+
+// Export functions for use in other scripts
+window.prayerBoard = prayerBoard;
+window.saveEnvelope = saveEnvelope;
 
 // Drag and Drop Functionality
 const initializeDragAndDrop = () => {

@@ -19,7 +19,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <a href="/" class="text-xl font-bold text-blue-600">Prayer Board</a>
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user_id'])): ?>
-                        <a href="/dashboard.php" class="text-gray-600 hover:text-gray-800">Dashboard</a>
+                        <a href="./dashboard.php" class="text-gray-600 hover:text-gray-800">Dashboard</a>
                         <div class="relative group">
                             <button class="text-gray-600 hover:text-gray-800">
                                 <?php echo htmlspecialchars($_SESSION['username']); ?>

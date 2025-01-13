@@ -91,55 +91,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             header("Location: board.php?id=" . urlencode($board_id));
             exit;
 
-            // case 'delete_envelope':
-            //     $envelope_id = $_POST['envelope_id'] ?? null;
-            //     $board_id = $_POST['board_id'] ?? null;
-                
-            //     if (!$envelope_id || !$board_id) {
-            //         $_SESSION['error'] = 'Invalid envelope or board ID';
-            //         header("Location: board.php?id=" . urlencode($board_id));
-            //         exit;
-            //     }
-                
-            //     try {
-            //         // First verify that this envelope belongs to a board owned by the current user
-            //         $checkStmt = $pdo->prepare("
-            //             SELECT e.id 
-            //             FROM envelopes e
-            //             JOIN boards b ON e.board_id = b.id
-            //             WHERE e.id = ? AND e.board_id = ? AND b.user_id = ?
-            //         ");
-                    
-            //         $checkStmt->execute([$envelope_id, $board_id, $_SESSION['user_id']]);
-                    
-            //         if ($checkStmt->rowCount() === 0) {
-            //             $_SESSION['error'] = 'You do not have permission to delete this envelope';
-            //             header("Location: board.php?id=" . urlencode($board_id));
-            //             exit;
-            //         }
-                    
-            //         // If verification passes, proceed with deletion
-            //         $deleteStmt = $pdo->prepare("
-            //             DELETE FROM envelopes 
-            //             WHERE id = ? AND board_id = ?
-            //         ");
-                    
-            //         if ($deleteStmt->execute([$envelope_id, $board_id])) {
-            //             if ($deleteStmt->rowCount() > 0) {
-            //                 $_SESSION['success'] = 'Envelope deleted successfully';
-            //             } else {
-            //                 $_SESSION['error'] = 'Envelope not found';
-            //             }
-            //         } else {
-            //             $_SESSION['error'] = 'Failed to delete envelope';
-            //         }
-            //     } catch (PDOException $e) {
-            //         $_SESSION['error'] = 'Database error occurred';
-            //         error_log('Database error: ' . $e->getMessage());
-            //     }
-                
-            //     header("Location: board.php?id=" . urlencode($board_id));
-            //     exit;
             case 'delete_envelope':
                 $envelope_id = $_POST['envelope_id'] ?? null;
                 $board_id = $_POST['board_id'] ?? null;

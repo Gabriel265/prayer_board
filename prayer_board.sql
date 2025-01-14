@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Jan 13, 2025 at 03:30 PM
+-- Generation Time: Jan 14, 2025 at 01:30 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -36,15 +36,6 @@ CREATE TABLE `envelopes` (
   `order_index` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `envelopes`
---
-
-INSERT INTO `envelopes` (`id`, `board_id`, `name`, `color`, `is_answered_envelope`, `order_index`) VALUES
-(1, 1, 'family edited', '#9e78a1', 0, 0),
-(2, 1, 'Career', '#8bfdae', 0, 1),
-(5, 2, 'third envelope', '#491d1d', 0, 2);
-
 -- --------------------------------------------------------
 
 --
@@ -60,14 +51,6 @@ CREATE TABLE `prayer_boards` (
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
---
--- Dumping data for table `prayer_boards`
---
-
-INSERT INTO `prayer_boards` (`id`, `user_id`, `name`, `description`, `background_color`, `created_at`) VALUES
-(1, 1, '2025', '2025 board', '#854bdd', '2025-01-09 08:43:12'),
-(2, 1, '2026', 'my board for 2026', '#81a8c1', '2025-01-13 11:12:54');
-
 -- --------------------------------------------------------
 
 --
@@ -82,16 +65,20 @@ CREATE TABLE `prayer_points` (
   `answered_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
 --
--- Dumping data for table `prayer_points`
+-- Table structure for table `testimonials`
 --
 
-INSERT INTO `prayer_points` (`id`, `envelope_id`, `content`, `created_at`, `answered_at`) VALUES
-(1, 1, 'Stability', '2025-01-13 09:24:07', NULL),
-(2, 1, 'Prosperity', '2025-01-13 09:24:40', NULL),
-(3, 1, 'Stability edited', '2025-01-13 09:59:38', NULL),
-(6, 2, 'for career', '2025-01-13 11:06:51', NULL),
-(7, 5, 'gifts', '2025-01-13 12:52:00', NULL);
+CREATE TABLE `testimonials` (
+  `id` int(11) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `comment` text NOT NULL,
+  `status` enum('active','archived') DEFAULT 'active',
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -104,15 +91,9 @@ CREATE TABLE `users` (
   `username` varchar(50) DEFAULT NULL,
   `email` varchar(100) DEFAULT NULL,
   `password_hash` varchar(255) DEFAULT NULL,
-  `created_at` timestamp NOT NULL DEFAULT current_timestamp()
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `profile_picture` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
---
--- Dumping data for table `users`
---
-
-INSERT INTO `users` (`id`, `username`, `email`, `password_hash`, `created_at`) VALUES
-(1, 'Gabriel', 'gabrielkadiwa@gmail.com', '$2y$10$5.X5UtWIsXYr4ABpfsbA3eTRC28u9wlnz.HWrWAsH5/CQ6MPt5mDq', '2025-01-09 08:42:18');
 
 --
 -- Indexes for dumped tables
@@ -140,6 +121,13 @@ ALTER TABLE `prayer_points`
   ADD KEY `envelope_id` (`envelope_id`);
 
 --
+-- Indexes for table `testimonials`
+--
+ALTER TABLE `testimonials`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `user_id` (`user_id`);
+
+--
 -- Indexes for table `users`
 --
 ALTER TABLE `users`
@@ -155,19 +143,25 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `envelopes`
 --
 ALTER TABLE `envelopes`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `prayer_boards`
 --
 ALTER TABLE `prayer_boards`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `prayer_points`
 --
 ALTER TABLE `prayer_points`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `testimonials`
+--
+ALTER TABLE `testimonials`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `users`
@@ -196,6 +190,12 @@ ALTER TABLE `prayer_boards`
 --
 ALTER TABLE `prayer_points`
   ADD CONSTRAINT `prayer_points_ibfk_1` FOREIGN KEY (`envelope_id`) REFERENCES `envelopes` (`id`);
+
+--
+-- Constraints for table `testimonials`
+--
+ALTER TABLE `testimonials`
+  ADD CONSTRAINT `testimonials_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

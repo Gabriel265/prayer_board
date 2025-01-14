@@ -1,16 +1,6 @@
 <?php
 $pageTitle = 'About Us';
-$relativePath = getRelativePath();
 require_once 'header.php';
-
-
-
-// First, get the depth of the current page relative to the root
-function getRelativePath() {
-    $currentPath = $_SERVER['PHP_SELF'];
-    $depth = substr_count(dirname($currentPath), '/') - 1;
-    return str_repeat('../', $depth);
-}
 ?>
 
 <div class="max-w-4xl mx-auto bg-white p-8 rounded-lg shadow-md">

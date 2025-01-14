@@ -1,18 +1,11 @@
 <?php
 $pageTitle = 'Welcome to Prayer Board';
-$relativePath = getRelativePath();
 require_once 'config/database.php';
 require_once 'includes/header.php';
-require_once 'includes/auth.php';
 
 
 
-// First, get the depth of the current page relative to the root
-function getRelativePath() {
-    $currentPath = $_SERVER['PHP_SELF'];
-    $depth = substr_count(dirname($currentPath), '/') - 1;
-    return str_repeat('../', $depth);
-}
+
 
 
 // Handle form submissions

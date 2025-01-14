@@ -1,6 +1,7 @@
 <?php
 require_once 'config/database.php';
 require_once 'includes/auth.php';
+require_once 'includes/header.php';
 requireLogin();
 
 // Fetch user's prayer boards
@@ -144,7 +145,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 <h1 class="text-xl font-bold">Prayer Board</h1>
                 <div class="flex items-center space-x-4">
                     <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                    <a href="logout.php" class="text-red-500">Logout</a>
+                    <a href="logout.php" class="text-red-500">Forums</a>
+                    <a href="logout.php" class="text-red-500">Private Chats</a>
                 </div>
             </div>
         </div>
@@ -293,3 +295,4 @@ function hideEditBoardModal() {
     </script>
 </body>
 </html>
+<?php require_once 'includes/footer.php'; ?>

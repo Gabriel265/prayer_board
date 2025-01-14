@@ -20,7 +20,7 @@ if (isset($_SESSION['id'])) {
     session_destroy();  
 }  
 
-// Redirect to login page or home page  
-header("Location: login.php"); // Change to your login page  
+// Redirect to home page  
+header("Location: index.php"); // Change to your login page  
 exit();  
 ?>

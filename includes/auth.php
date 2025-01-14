@@ -26,6 +26,7 @@ function loginUser($email, $password) {
     $user = $stmt->fetch();
     
     if ($user && password_verify($password, $user['password_hash'])) {
+        session_regenerate_id(true);
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         return true;
@@ -37,8 +38,33 @@ function isLoggedIn() {
     return isset($_SESSION['user_id']);
 }
 
+// function logout() {
+//     session_destroy();
+//     header('Location: login.php');
+//     exit();
+// }
+
+// auth.php
 function logout() {
+    // Unset all session variables
+    $_SESSION = array();
+    
+    // Delete the session cookie
+    if (ini_get("session.use_cookies")) {
+        $params = session_get_cookie_params();
+        setcookie(session_name(), '', time() - 42000,
+            $params["path"], $params["domain"],
+            $params["secure"], $params["httponly"]
+        );
+    }
+    
+    // Destroy the session
     session_destroy();
+    
+    // Ensure the session is really destroyed by starting and destroying again
+    session_start();
+    session_destroy();
+    
     header('Location: login.php');
     exit();
 }

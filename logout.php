@@ -1,26 +1,26 @@
-<?php  
-// Start the session  
-session_start();  
+// logout.php
+<?php
+session_start();
 
-// Check if the user is logged in  
-if (isset($_SESSION['id'])) {  
-    // Unset all of the session variables  
-    $_SESSION = array();  
-    
-    // If it's desired to kill the session, also delete the session cookie.  
-    if (ini_get("session.use_cookies")) {  
-        $params = session_get_cookie_params();  
-        setcookie(session_name(), '', time() - 42000,  
-            $params["path"], $params["domain"],  
-            $params["secure"], $params["httponly"]  
-        );  
-    }  
-    
-    // Finally, destroy the session  
-    session_destroy();  
-}  
+// Unset all session variables
+$_SESSION = array();
 
-// Redirect to home page  
-header("Location: index.php"); // Change to your login page  
-exit();  
+// Delete the session cookie
+if (ini_get("session.use_cookies")) {
+    $params = session_get_cookie_params();
+    setcookie(session_name(), '', time() - 42000,
+        $params["path"], $params["domain"],
+        $params["secure"], $params["httponly"]
+    );
+}
+
+// Destroy the session
+session_destroy();
+
+// Ensure the session is really destroyed by starting and destroying again
+session_start();
+session_destroy();
+
+header("Location: index.php");
+exit();
 ?>

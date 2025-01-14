@@ -139,18 +139,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-gray-100">
-    <nav class="bg-white shadow-lg">
+    <!-- <nav class="bg-white shadow-lg">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <h1 class="text-xl font-bold">Prayer Board</h1>
+                <h1 class="text-xl font-bold"></h1>
                 <div class="flex items-center space-x-4">
                     <span>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></span>
-                    <a href="logout.php" class="text-red-500">Forums</a>
-                    <a href="logout.php" class="text-red-500">Private Chats</a>
+                    <a href="" class="text-red-500">Forums</a>
+                    <a href="" class="text-red-500">Private Chats</a>
                 </div>
             </div>
         </div>
-    </nav>
+    </nav> -->
 
     <main class="max-w-6xl mx-auto px-4 py-8">
         <div class="flex justify-between items-center mb-8">

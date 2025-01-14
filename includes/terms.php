@@ -10,7 +10,9 @@ require_once 'header.php';
 
         <section class="mb-8">
             <h2 class="text-2xl font-semibold text-gray-800 mb-4">1. Acceptance of Terms</h2>
-            <p>
+            <p> Don't use this for real life applications as I just created it during my free time and it is not optimized 
+                for live commecial deployments and will keep adding more features to it in the future. For now I will need yourfeeback on changes and aditions you feel
+                are good or this website.
                 By accessing and using Prayer Board ("the Service"), you agree to be bound by these Terms of 
                 Service. If you disagree with any part of these terms, you may not access the Service.
             </p>

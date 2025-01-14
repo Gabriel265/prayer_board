@@ -62,6 +62,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <!-- Features Section -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 py-16">
+    <div class="text-center p-6">
+            <div class="bg-purple-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+            </div>
+            <h2 class="text-xl font-semibold mb-4">Disclaimer</h2>
+            <p class="text-gray-600">Don't use this for real life applications as I just created it during my free time and it is not optimized 
+                for live commecial deployments and will keep adding more features to it in the future. For now I will need yourfeeback on changes and aditions you feel
+                are good or this website.</p>
+        </div>
         <div class="text-center p-6">
             <div class="bg-blue-100 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <svg class="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">

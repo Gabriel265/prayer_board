@@ -10,13 +10,13 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?php echo $pageTitle ?? 'Prayer Board'; ?></title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="/assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo $relativePath; ?>assets/css/styles.css">
 </head>
 <body class="bg-gray-100">
     <nav class="bg-white shadow-lg">
         <div class="max-w-6xl mx-auto px-4">
             <div class="flex justify-between items-center py-4">
-                <a href="/" class="text-xl font-bold text-blue-600">Prayer Board</a>
+                <a href="<?php echo $relativePath; ?>index.php" class="text-xl font-bold text-blue-600">Prayer Board</a>
                 <div class="flex items-center space-x-4">
                     <?php if (isset($_SESSION['user_id'])): ?>
                         <a href="./dashboard.php" class="text-gray-600 hover:text-gray-800">Dashboard</a>

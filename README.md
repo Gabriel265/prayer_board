@@ -1,6 +1,7 @@
 Prayer Board
 A simple application where users can create boards, each containing different categories for various aspects of life, and in which prayers can be created.
-Tech Stack: PHP, CSS, Javascript, SQL
+
+languages: PHP, CSS, Javascript, SQL
 
 Features
 MySQL Database

@@ -15,10 +15,11 @@ Cloning the Repository
 
 Import the prayer_board.sql in xamp for the database.
 
-![View Prayers](pictures/view%20prayers.jpg)  
-![Home](pictures/home.jpg)  
+  
+![Home](pictures/home.jpg) 
+![Boards](pictures/boards.jpg) 
 ![Categories](pictures/categories.jpg)  
-![Boards](pictures/boards.jpg)  
+![View Prayers](pictures/view%20prayers.jpg)
 
 
-NOTE: feel free to share some enhancement ideas
+NOTE: Feel free to share some enhancement ideas
